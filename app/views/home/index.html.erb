@@ -1,0 +1,69 @@
+<div class="box notice">
+  <i class="ico-notice"></i>
+  This app works best if you <a href="https://help.shopify.com/manual/sell-online/checkout-settings/order-fulfilment#configure-your-order-fulfillment-settings" target="_blank">disable automatic fulfillment</a> from Shopify.
+</div>
+
+<div class="section">
+  <div class="section-summary">
+    <h1>Setup</h1>
+    <p><a href="<%= Rails.application.config.service_url %>" target="_blank">Need help?</a></p>
+  </div>
+
+  <div class="section-content">
+    <div class="section-row">
+      <div class="section-cell">
+        <%= form_for shop do |f| %>
+          <%= f.label :token %>
+          <%= f.text_area :token %>
+          <div class="input-wrapper inline">
+            <div class="checkbox-wrapper">
+              <%= f.check_box :fulfill_order, class: 'checkbox' %>
+              <span class="checkbox-styled"></span>
+            </div>
+
+            <%= f.label :fulfill_order, 'Automatically fulfill orders on success' %>
+          </div>
+          <div class="input-wrapper inline">
+            <div class="checkbox-wrapper">
+              <%= f.check_box :cancel_order, class: 'checkbox' %>
+              <span class="checkbox-styled"></span>
+            </div>
+
+            <%= f.label :cancel_order, 'Automatically cancel orders on failure' %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% content_for :shopify_app_javascript do %>
+  var tokenField = document.querySelector('#shop_token');
+  var cancelOrder = document.querySelector('#shop_cancel_order');
+  var fulfillOrder = document.querySelector('#shop_fulfill_order');
+
+  ShopifyApp.Bar.renderAllButtons = function() {
+    ShopifyApp.Bar.initialize({
+      buttons: {
+        primary: { label: "Save", callback: function() {
+          $('form').submit()
+        }}
+      }
+    });
+  }
+
+  tokenField.addEventListener('keyup', ShopifyApp.Bar.renderAllButtons);
+  cancelOrder.addEventListener('change', ShopifyApp.Bar.renderAllButtons);
+  fulfillOrder.addEventListener('change', ShopifyApp.Bar.renderAllButtons);
+
+  ShopifyApp.Bar.renderAllButtons();
+  ShopifyApp.Bar.disableAllButtons();
+
+  <% if flash[:notice].present? %>
+    ShopifyApp.flashNotice('<%= flash[:notice] %>');
+  <% end %>
+
+  <% if shop.errors.any? %>
+    ShopifyApp.flashError('Oops, something went wrong!');
+  <% end %>
+<% end %>

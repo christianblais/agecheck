@@ -1,0 +1,8 @@
+function serviceCallback() {
+  // do something
+}
+
+libScript = document.createElement('script');
+libScript.type = 'text/javascript';
+libScript.src = "#{Rails.application.config.service_url}/script.js??token=<%= @token %>";
+document.getElementsByTagName('body')[0].appendChild(libScript);
